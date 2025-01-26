@@ -1,10 +1,35 @@
 import { PageProps } from '@/types';
-import { useState } from 'react';
-import { Head, Link } from '@inertiajs/react';
+import { useState, ChangeEvent, FormEvent } from 'react';
+import { Head, Link, router } from '@inertiajs/react';
 import { Heart, AlertCircle } from 'lucide-react';
 
+interface FormData {
+    [key: string]: string | string[];  // Add index signature for Inertia compatibility
+    firstName: string;
+    lastName: string;
+    email: string;
+    password: string;
+    country: string;
+    city: string;
+    gender: string;
+    interestedIn: string[];
+    dateOfBirth: string;
+}
+
+interface FormErrors {
+    firstName?: string;
+    lastName?: string;
+    email?: string;
+    password?: string;
+    country?: string;
+    city?: string;
+    gender?: string;
+    interestedIn?: string;
+    dateOfBirth?: string;
+}
+
 const SignupPage = () => {
-    const [formData, setFormData] = useState({
+    const [formData, setFormData] = useState<FormData>({
         firstName: '',
         lastName: '',
         email: '',
@@ -16,16 +41,16 @@ const SignupPage = () => {
         dateOfBirth: '',
     });
 
-    const [errors, setErrors] = useState({});
+    const [errors, setErrors] = useState<FormErrors>({});
 
-    const handleChange = (e) => {
+    const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         setFormData(prev => ({
             ...prev,
             [name]: value
         }));
         // Clear error when user starts typing
-        if (errors[name]) {
+        if (errors[name as keyof FormErrors]) {
             setErrors(prev => ({
                 ...prev,
                 [name]: ''
@@ -33,7 +58,7 @@ const SignupPage = () => {
         }
     };
 
-    const handleCheckboxChange = (e) => {
+    const handleCheckboxChange = (e: ChangeEvent<HTMLInputElement>) => {
         const { value, checked } = e.target;
         setFormData(prev => ({
             ...prev,
@@ -43,8 +68,8 @@ const SignupPage = () => {
         }));
     };
 
-    const validateForm = () => {
-        const newErrors = {};
+    const validateForm = (): FormErrors => {
+        const newErrors: FormErrors = {};
 
         if (!formData.firstName.trim()) newErrors.firstName = 'First name is required';
         if (!formData.lastName.trim()) newErrors.lastName = 'Last name is required';
@@ -60,13 +85,20 @@ const SignupPage = () => {
         return newErrors;
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         const newErrors = validateForm();
 
         if (Object.keys(newErrors).length === 0) {
-            // Handle successful form submission
-            console.log('Form submitted:', formData);
+            router.post('/new-user', formData, {
+                onError: (errors) => {
+                    setErrors(errors as FormErrors);
+                },
+                onSuccess: () => {
+                    // Redirect will be handled by the server response
+                    console.log('Registration successful');
+                },
+            });
         } else {
             setErrors(newErrors);
         }
