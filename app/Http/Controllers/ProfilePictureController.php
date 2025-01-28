@@ -13,17 +13,34 @@ class ProfilePictureController extends Controller
             'profile_picture' => 'required|image|max:2048', // 2MB max
         ]);
 
-        $path = $request->file('profile_picture')->store('profile-pictures', 'public');
-        
-        // Delete old profile picture if it exists
-        if ($request->user()->profile_picture) {
-            Storage::disk('public')->delete($request->user()->profile_picture);
+        try {
+            // Ensure the profile-pictures directory exists
+            Storage::disk('public')->makeDirectory('profile-pictures');
+
+            // Generate a unique filename
+            $filename = uniqid() . '_' . time() . '.' . $request->file('profile_picture')->getClientOriginalExtension();
+            
+            // Store the new file
+            $path = $request->file('profile_picture')->storeAs(
+                'profile-pictures',
+                $filename,
+                'public'
+            );
+            
+            // Delete old profile picture if it exists
+            if ($request->user()->profile_picture) {
+                Storage::disk('public')->delete($request->user()->profile_picture);
+            }
+
+            // Update user with new profile picture path
+            $request->user()->update([
+                'profile_picture' => $path
+            ]);
+
+            // Return a redirect back to ensure page refresh
+            return back();
+        } catch (\Exception $e) {
+            return back()->withErrors(['profile_picture' => 'Failed to upload profile picture.']);
         }
-
-        $request->user()->update([
-            'profile_picture' => $path
-        ]);
-
-        return back();
     }
 }

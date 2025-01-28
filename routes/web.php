@@ -47,6 +47,13 @@ Route::get('/sign-up', function () {
     return Inertia::render('SignUp', []);
 });
 
+Route::get('/sign-in', function () {
+    return Inertia::render('Auth/Login', [
+        'canResetPassword' => Route::has('password.request'),
+        'status' => session('status'),
+    ]);
+});
+
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');

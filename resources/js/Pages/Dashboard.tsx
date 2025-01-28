@@ -8,6 +8,7 @@ interface User {
     name: string;
     email: string;
     profile_picture?: string;
+    profile_picture_url?: string;
     country?: string;
     city?: string;
     gender?: string;
@@ -38,7 +39,7 @@ export default function Dashboard({ auth }: PageProps<{ auth: { user: User } }>)
                         <div className="md:col-span-1">
                             <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
                                 <div className="flex flex-col items-center">
-                                    <ProfilePictureUpload currentPicture={user.profile_picture} />
+                                    <ProfilePictureUpload currentPicture={user.profile_picture_url} />
                                     
                                     <h2 className="mt-4 text-2xl font-semibold text-gray-900">
                                         {user.name}

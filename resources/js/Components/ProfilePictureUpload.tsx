@@ -1,20 +1,30 @@
-import { useForm } from '@inertiajs/react';
+import { router } from '@inertiajs/react';
 import { ChangeEvent, useState } from 'react';
 
 export default function ProfilePictureUpload({ currentPicture }: { currentPicture?: string }) {
-    const [preview, setPreview] = useState<string | null>(null);
-    const { post, processing } = useForm({
-        profile_picture: null as File | null,
-    });
+    const [processing, setProcessing] = useState(false);
 
     const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
-            setPreview(URL.createObjectURL(file));
-            post('/update-profile-picture', {
-                preserveScroll: true,
+            setProcessing(true);
+            
+            const formData = new FormData();
+            formData.append('profile_picture', file);
+            
+            router.post('/update-profile-picture', formData, {
                 forceFormData: true,
-                data: { profile_picture: file },
+                preserveScroll: true,
+                onSuccess: () => {
+                    // Force a full page refresh to ensure we get fresh data
+                    window.location.reload();
+                },
+                onError: () => {
+                    setProcessing(false);
+                },
+                onFinish: () => {
+                    setProcessing(false);
+                }
             });
         }
     };
@@ -22,9 +32,9 @@ export default function ProfilePictureUpload({ currentPicture }: { currentPictur
     return (
         <div className="relative group">
             <div className="relative h-32 w-32 rounded-full overflow-hidden border-4 border-pink-200 group-hover:border-pink-400 transition-colors">
-                {(preview || currentPicture) ? (
+                {currentPicture ? (
                     <img
-                        src={preview || currentPicture}
+                        src={currentPicture}
                         alt="Profile"
                         className="h-full w-full object-cover"
                     />

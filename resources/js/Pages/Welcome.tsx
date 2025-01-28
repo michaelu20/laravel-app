@@ -12,7 +12,9 @@ const LandingPage = () => {
                     <span className="text-2xl font-bold text-gray-800">LoveFinder</span>
                 </div>
                 <div className="space-x-6">
-                    <button className="text-gray-600 hover:text-gray-800">Sign In</button>
+                    <Link href='/sign-in'>
+                        <button className="text-gray-600 hover:text-gray-800">Sign In</button>
+                    </Link>
                     <Link href='/sign-up'>
                         <button className="bg-pink-500 text-white px-4 py-2 rounded-full hover:bg-pink-600">
                             Get Started
@@ -101,9 +103,11 @@ const LandingPage = () => {
                     <p className="text-xl text-gray-600 mb-8">
                         Join our community today and take the first step towards finding your perfect match.
                     </p>
-                    <button className="bg-pink-500 text-white px-8 py-4 rounded-full text-lg font-semibold hover:bg-pink-600">
-                        Create Free Account
-                    </button>
+                    <Link href='/sign-up'>
+                        <button className="bg-pink-500 text-white px-8 py-4 rounded-full text-lg font-semibold hover:bg-pink-600">
+                            Create Free Account
+                        </button>
+                    </Link>
                 </div>
             </div>
 

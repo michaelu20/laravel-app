@@ -52,4 +52,30 @@ class User extends Authenticatable
             'interested_in' => 'array',
         ];
     }
+
+    /**
+     * Get the profile picture URL.
+     */
+    protected function getProfilePictureUrlAttribute(): ?string
+    {
+        if (!$this->profile_picture) {
+            return null;
+        }
+
+        $path = 'storage/' . $this->profile_picture;
+        
+        // Check if file exists
+        if (!file_exists(public_path($path))) {
+            return null;
+        }
+
+        return asset($path) . '?v=' . filemtime(public_path($path));
+    }
+
+    /**
+     * The accessors to append to the model's array form.
+     *
+     * @var array<int, string>
+     */
+    protected $appends = ['profile_picture_url'];
 }
